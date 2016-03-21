@@ -23,6 +23,8 @@ declare BASE_DIR="${BASE_DIR:-base}"
 declare VERSIONS_BASE="${VERSIONS_BASE:-versions/base}"
 source "$VERSIONS_BASE"
 
+declare REGISTRY_BASE="${REGISTRY_BASE:-resnullius}"
+
 mkbasecp() {
   local OUT_DIR="versions/$1/$2"
   mkdir -p "$OUT_DIR"
@@ -35,7 +37,7 @@ update_from() {
 }
 
 create_tag() {
-  echo "export TAGS=(resnullius/$3-devel:$4)" > "versions/$1/$2/options"
+  echo "export TAGS=($REGISTRY_BASE/$3-devel:$4)" > "versions/$1/$2/options"
 }
 
 run_updater() {
