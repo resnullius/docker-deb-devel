@@ -1,7 +1,8 @@
-docker-alpine-dev
-=================
+docker-dev-devel
+================
 
-    docker pull resnullius/debian-devel
+    docker pull resnullius/debian-devel:unstable
+    docker pull resnullius/ubuntu-devel:xenial
 
 WHAT IS THIS?
 -------------
