@@ -1,67 +1,68 @@
-#!/usr/bin/env sh
-set -e
-USER=$(whoami)
-ARCH=$(uname -m)
-BUILD_ARCH="$ARCH"
+#!/usr/bin/env bash
+# vim: ft=sh tw=80
 
-PRE=$(echo "$ARCH" | grep "arm") && echo "ANYTHING"
+declare help="
+"
+
+declare ARCH
+ARCH=$(uname -m)
+declare BUILD_ARCH="$ARCH"
+declare OUTPUT_DIR="/opt/pkgs"
+declare PKG_NAME
+
+declare PRE
+PRE=$(echo "$ARCH" | grep "arm")
 if [ "$PRE" == "$ARCH" ]; then
   BUILD_ARCH="armhf"
 fi
 
-REPO_DIR=/opt/repo/"$BUILD_ARCH"
-
-copy_keys() {
-  mkdir "$HOME"/.abuild
-  sudo cp /opt/keys/*.rsa* "$HOME"/.abuild/ && \
-    sudo chown "$USER" "$HOME"/.abuild/*
-  sudo cp /opt/keys/*.rsa.pub /etc/apk/keys
+eval_opts() {
+  while getopts ":o:p:" opt "$@"; do
+    case "$opt" in
+      o)    OUTPUT_DIR="$OPTARG";;
+      p)    PKG_NAME="$OPTARG";;
+      \?)   echo "Invalid option -$OPTARG was ignored." >&2;;
+      :)
+        echo "Option -$OPTARG requires an argument." >&2
+        echo "$help"
+        exit 1;;
+    esac
+  done
 }
 
-copy_src() {
-  sudo cp -R /opt/src/* "$HOME"/src && \
-    sudo chown -R "$USER" "$HOME"/src
+cp_to_workplace() {
+  mkdir "$PKG_NAME"
+  cp -r /opt/src/* "$PWD"/"$PKG_NAME"/
 }
 
-add_local_repo() {
-  [ -d "$REPO_DIR" ] && \
-    [ -f "$REPO_DIR"/APKINDEX.tar.gz ] && \
-    sudo sh -c "echo /opt/repo >> /etc/apk/repositories"
-  echo "If there was anything on your repo, it's available now"
+print_motd() {
+  echo "Building pkg $PKG_NAME for arch $BUILD_ARCH"
+  echo "Final package will be put on $OUTPUT_DIR"
+}
+
+install_builddeps() {
+  mk-build-deps --install "$PKG_NAME"/debian/control
 }
 
 run_build() {
-  mkdir -p "$HOME"/packages
-  abuild-apk update
-  abuild checksum && abuild "$@"
+  pushd "$PKG_NAME"
+  dpkg-buildpackage -us -uc
+  popd
 }
 
-copy_finalpkg() {
-
-  [ -d "$REPO_DIR" ] || sudo mkdir -p "$REPO_DIR"
-  sudo cp "$HOME"/packages/builder/"$BUILD_ARCH"/*.apk /opt/repo/"$BUILD_ARCH"/
-}
-
-gen_apkindex() {
-  cd /opt/repo/"$BUILD_ARCH"/
-  sudo apk index -o APKINDEX.tar.gz ./*.apk
-  sudo abuild-sign APKINDEX.tar.gz
-}
-
-update_apkbuild() {
-  sudo cp "$HOME"/src/APKBUILD /opt/src/
+mv_pkgs() {
+  mv "$PWD"/*.{deb,dsc,changes,tar.gz} "$OUTPUT_DIR"
 }
 
 main() {
-  sh /bin/setup-system.sh
+  set -eo pipefail; [[ "$TRACE" ]] && set -x
 
-  copy_keys
-  copy_src
-  add_local_repo
-  run_build "$@"
-  copy_finalpkg
-  gen_apkindex
-  update_apkbuild
+  eval_opts "$@"
+  cp_to_workplace
+  [ -e "$KEEP_QUIET" ] && print_motd
+  install_builddeps
+  run_build
+  mv_pkgs
 }
 
 main "$@"
