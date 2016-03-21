@@ -5,7 +5,7 @@ declare help="
 Update script for deb-devel's docker versions.
 
 Usage:
-  update-versions.bash run [<versions/arch>]
+  update-versions.bash run
   update-versions.bash --version
   update-versions.bash -h | --help
 
