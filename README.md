@@ -24,6 +24,11 @@ Then you will want to checkout `versions/base`, it's a simple file exporting
 variables saying which debian-based images and tags will be build, as well as
 which CPU architecture.
 
+I WANT TO PUSH IT TO MY USER/MY REGISTRY
+----------------------------------------
+Just change on `versions/base` the `REGISTRY_BASE` variable, if it's your own
+registry then put the `url.com/for/your/registry/and/path`.
+
 THIS IS NOT THE SAME THING YOU BUILT FOR ALPINE!
 ------------------------------------------------
 Yeah, people can write stuff in different ways each time, I like this better and
