@@ -1,4 +1,4 @@
-FROM 
+FROM debian:unstable
 MAINTAINER Jose-Luis Rivas <me@ghostbar.co>
 
 VOLUME /opt/pkgs

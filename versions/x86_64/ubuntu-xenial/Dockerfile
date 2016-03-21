@@ -1,4 +1,4 @@
-FROM 
+FROM ubuntu:xenial
 MAINTAINER Jose-Luis Rivas <me@ghostbar.co>
 
 VOLUME /opt/pkgs

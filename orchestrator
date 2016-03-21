@@ -2,15 +2,13 @@
 # vim: ft=sh tw=80
 
 declare help="
-Orchestrator script for Alpine's development images.
+Orchestrator script for Deb-building development images.
 
 Usage:
   orchestrator test
   orchestrator push
   orchestrator build
-  orchestrator update-base
   orchestrator update-versions
-  orchestrator update-all
   orchestrator --version
   orchestrator -h | --help
 
@@ -34,7 +32,7 @@ build() {
 
   for version in $VERSIONS; do
     echo "Building version $version"
-    ( # shellcheck source=versions/x86_64/3.3/options
+    ( # shellcheck source=versions/x86_64/debian-unstable/options
     source "$version"/options
     for tag in "${TAGS[@]}"; do
       docker build -t "$tag" "$version"
@@ -45,9 +43,16 @@ build() {
 
 run_tests() {
   echo "Tests running for $ARCH:"
-  declare test_files="${TESTS_FILES:-tests/$ARCH-*.bats}"
-  # shellcheck disable=SC2086
-  bats $test_files
+  declare -a test_files
+  for file in $VERSIONS; do
+    source "$file/options"
+    local tag
+    tag="${TAGS[0]}"
+    tag="${tag//:/-}"
+    tag="${tag//\//_}"
+    test_files+=("tests/test_${tag}.bats")
+  done
+  bats "${test_files[@]}"
 }
 
 push() {
@@ -55,7 +60,7 @@ push() {
 
   for version in $VERSIONS; do
     echo "Pushing version $version"
-    ( # shellcheck source=versions/x86_64/3.3/options
+    ( # shellcheck source=versions/x86_64/debian-unstable/options
     source "$version"/options
     for tag in "${TAGS[@]}"; do
       if docker history "$tag" &> /dev/null; then
@@ -66,18 +71,8 @@ push() {
   done
 }
 
-update_base() {
-  bash bin/update-base.bash run
-}
-
 update_versions() {
   bash bin/update-versions.bash run
-}
-
-update_all() {
-  update_base
-
-  update_versions
 }
 
 version() {
@@ -95,11 +90,9 @@ main() {
     test)                 shift; run_tests "$@";;
     build)                shift; build "$@";;
     push)                 shift; push "$@";;
-    update-all)           shift; update_all "$@";;
+    update-versions)      shift; update_versions;;
     -h|--help)            shift; help "$@";;
     --version)            shift; version;;
-    update-base)          shift; update_base;;
-    update-versions)      shift; update_versions;;
     *)                    help "$@";;
   esac
 }
