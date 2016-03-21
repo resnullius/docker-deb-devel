@@ -6,7 +6,7 @@ VOLUME /opt/src
 
 WORKDIR /opt/workplace
 
-RUN apt-get install build-essential devscripts -y
+RUN apt-get update && apt-get install build-essential devscripts -y
 
 COPY scripts/* /bin/
 
