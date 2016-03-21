@@ -43,9 +43,16 @@ build() {
 
 run_tests() {
   echo "Tests running for $ARCH:"
-  declare test_files="${TESTS_FILES:-tests/$ARCH-*.bats}"
-  # shellcheck disable=SC2086
-  bats $test_files
+  declare -a test_files
+  for file in $VERSIONS; do
+    source "$file/options"
+    local tag
+    tag="${TAGS[0]}"
+    tag="${tag//:/-}"
+    tag="${tag//\//_}"
+    test_files+=("tests/test_${tag}.bats")
+  done
+  bats "${test_files[@]}"
 }
 
 push() {
