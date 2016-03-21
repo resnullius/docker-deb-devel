@@ -1,3 +1,3 @@
-export VERSIONS=(debian:unstable ubuntu:xenial)
+export VERSIONS=(debian:stable debian:testing debian:unstable ubuntu:trusty ubuntu:wily ubuntu:xenial)
 export ARCHS=(x86_64)
 export REGISTRY_BASE="resnullius"
