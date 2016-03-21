@@ -2,7 +2,7 @@
 # vim: ft=sh
 
 declare help="
-Update script for debian-devel's docker versions.
+Update script for deb-devel's docker versions.
 
 Usage:
   update-versions.bash run [<versions/arch>]
@@ -19,28 +19,39 @@ Version: 1.0.0.
 Licensed under the MIT terms.
 "
 
+declare BASE_DIR="${BASE_DIR:-base}"
 declare VERSIONS_BASE="${VERSIONS_BASE:-versions/base}"
-declare VERSIONS_CHILDS="${VERSIONS_CHILDS:-versions/x86_64}"
+source "$VERSIONS_BASE"
+
+mkbasecp() {
+  local OUT_DIR="versions/$1/$2"
+  mkdir -p "$OUT_DIR"
+  cp -r "$BASE_DIR"/* "$OUT_DIR"
+  mv "$OUT_DIR"/Dockerfile.base "$OUT_DIR"/Dockerfile
+}
+
+update_from() {
+  sed -i '' -e "s/FROM /FROM $3/" "versions/$1/$2/Dockerfile"
+}
 
 create_tag() {
-  local OPTIONS="${OPTIONS:-$1/**/options}"
-  for file in $OPTIONS; do
-    echo "tags on $file are being updated"
-    sed -i '' -e 's/debian-devel:/debian-devel-armhf:/g' "$file"
-  done
-  local DOCKERFILES="${DOCKERFILES:-$1/**/Dockerfile}"
-  for file in $DOCKERFILES; do
-    echo "FROM on $file is being updated"
-    sed -i '' -e 's/debian:/debian-armhf:/g' "$file"
-  done
+  echo "export TAGS=(resnullius/$3-devel:$4)" > "versions/$1/$2/options"
 }
 
 run_updater() {
-  for ver in $VERSIONS_CHILDS; do
-    echo "Copying scripts from $VERSIONS_BASE to $ver"
-    cp -R "$VERSIONS_BASE/" "$ver"
-    [[ "$ver" = "versions/armhf" ]] && create_tag "$ver"
-    echo "Done on $ver"
+  for arch in "${ARCHS[@]}"; do
+    rm -rf versions/"$arch"
+    for version in "${VERSIONS[@]}"; do
+      local name
+      local distro
+      local tag
+      name=$(echo "$version" | sed -e 's/:/-/')
+      distro=$(echo "$version" | sed -e 's/:.*//')
+      tag=$(echo "$version" | sed -e 's/.*://')
+      mkbasecp "$arch" "$name"
+      update_from "$arch" "$name" "$version"
+      create_tag "$arch" "$name" "$distro" "$tag"
+    done
   done
 }
 
