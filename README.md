@@ -14,7 +14,7 @@ HOW DO I USE IT?
 ----------------
 Good you ask! I made a very nice script in bash that will help you out and make
 it as easy as editing files and launching a command in your terminal! It's
-called [debian-build-pkg](https://github.com/resnullius/debian-build-pkg)
+called [deb-build-pkg](https://github.com/resnullius/deb-build-pkg)
 and will help you generating your keys, building your packages and even making
 it easy to get a ready-to-publish repo with your packages signed.
 
