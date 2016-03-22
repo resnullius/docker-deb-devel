@@ -2,6 +2,13 @@
 # vim: ft=sh tw=80
 
 declare help="
+Usage:
+  entrypoint.sh -p random [-o /opt/pkgs]
+
+Options:
+  -o    Output dir (change this if you changed the Dockerfile default from
+        /opt/pkgs).
+  -p    Package name (required)
 "
 
 declare ARCH
@@ -31,7 +38,7 @@ eval_opts() {
 }
 
 cp_to_workplace() {
-  mkdir "$PKG_NAME"
+  mkdir -p "$PKG_NAME"
   cp -r /opt/src/* "$PWD"/"$PKG_NAME"/
 }
 
@@ -41,13 +48,15 @@ print_motd() {
 }
 
 install_builddeps() {
-  mk-build-deps --install "$PKG_NAME"/debian/control
+  cd "$PKG_NAME"
+  mk-build-deps --install --tool "/usr/bin/apt-get --no-install-recommends -y" ./debian/control
+  cd ..
 }
 
 run_build() {
-  pushd "$PKG_NAME"
+  cd "$PKG_NAME"
   dpkg-buildpackage -us -uc
-  popd
+  cd ..
 }
 
 mv_pkgs() {
@@ -57,12 +66,18 @@ mv_pkgs() {
 main() {
   set -eo pipefail; [[ "$TRACE" ]] && set -x
 
-  eval_opts "$@"
-  cp_to_workplace
-  [ -e "$KEEP_QUIET" ] && print_motd
-  install_builddeps
-  run_build
-  mv_pkgs
+  declare cmd="$1"
+  case "$cmd" in
+    -h|--help)
+      print_help;;
+    *)
+      eval_opts "$@"
+      cp_to_workplace
+      [ -e "$KEEP_QUIET" ] && print_motd
+      install_builddeps
+      run_build
+      mv_pkgs;;
+  esac
 }
 
 main "$@"
