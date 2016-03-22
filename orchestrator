@@ -27,10 +27,11 @@ ARCH="$(uname -m)"
 declare VERSIONS="${VERSIONS:-versions/$ARCH/*}"
 
 build() {
+  declare build_files="${*:-$VERSIONS}"
   echo "Building for architecture: $ARCH"
-  echo "Will build versions: $VERSIONS"
+  echo "Will build versions: $build_files"
 
-  for version in $VERSIONS; do
+  for version in $build_files; do
     echo "Building version $version"
     ( # shellcheck source=versions/x86_64/debian-unstable/options
     source "$version"/options
