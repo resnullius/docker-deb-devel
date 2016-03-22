@@ -47,16 +47,22 @@ print_motd() {
   echo "Final package will be put on $OUTPUT_DIR"
 }
 
+download_upstream() {
+  pushd "$PKG_NAME"
+  uscan --force-download
+  popd
+}
+
 install_builddeps() {
-  cd "$PKG_NAME"
+  pushd "$PKG_NAME"
   mk-build-deps --install --tool "/usr/bin/apt-get --no-install-recommends -y" ./debian/control
-  cd ..
+  popd
 }
 
 run_build() {
-  cd "$PKG_NAME"
+  pushd "$PKG_NAME"
   dpkg-buildpackage -us -uc
-  cd ..
+  popd
 }
 
 mv_pkgs() {
@@ -74,6 +80,7 @@ main() {
       eval_opts "$@"
       cp_to_workplace
       [ -e "$KEEP_QUIET" ] && print_motd
+      download_upstream
       install_builddeps
       run_build
       mv_pkgs;;
