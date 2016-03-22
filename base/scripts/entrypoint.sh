@@ -2,6 +2,13 @@
 # vim: ft=sh tw=80
 
 declare help="
+Usage:
+  entrypoint.sh -p random [-o /opt/pkgs]
+
+Options:
+  -o    Output dir (change this if you changed the Dockerfile default from
+        /opt/pkgs).
+  -p    Package name (required)
 "
 
 declare ARCH
