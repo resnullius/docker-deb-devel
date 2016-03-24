@@ -19,6 +19,9 @@ Version: 1.0.0.
 Licensed under the MIT terms.
 "
 
+declare OS
+OS="$(uname -s)"
+
 declare BASE_DIR="${BASE_DIR:-base}"
 declare VERSIONS_BASE="${VERSIONS_BASE:-versions/base}"
 source "$VERSIONS_BASE"
@@ -33,7 +36,11 @@ mkbasecp() {
 }
 
 update_from() {
-  sed -i '' -e "s/FROM /FROM $3/" "versions/$1/$2/Dockerfile"
+  if [ "$OS" = "Darwin" ]; then
+    sed -i '' -e "s/FROM /FROM $3/" "versions/$1/$2/Dockerfile"
+  else
+    sed -i -e "s/FROM /FROM $3/" "versions/$1/$2/Dockerfile"
+  fi
 }
 
 create_tag() {
