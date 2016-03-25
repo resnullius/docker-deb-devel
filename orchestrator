@@ -59,7 +59,11 @@ run_tests() {
 push() {
   [[ "$NO_PUSH" ]] && return 0
 
-  for version in $VERSIONS; do
+  declare push_files="${*:-$VERSIONS}"
+  echo "Pushing for architecture: $ARCH"
+  echo "Will push versions $push_files"
+
+  for version in $push_files; do
     echo "Pushing version $version"
     ( # shellcheck source=versions/x86_64/debian-unstable/options
     source "$version"/options
