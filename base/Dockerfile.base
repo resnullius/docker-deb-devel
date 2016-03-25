@@ -6,7 +6,8 @@ VOLUME /opt/src
 
 WORKDIR /opt/workplace
 
-RUN apt-get update && apt-get install build-essential equivs devscripts -y
+RUN apt-get update && \
+  apt-get install build-essential equivs devscripts pristine-tar git -y
 
 COPY scripts/* /bin/
 
