@@ -69,6 +69,10 @@ mv_pkgs() {
   mv "$PWD"/*.{deb,dsc,changes,tar.gz} "$OUTPUT_DIR"
 }
 
+print_help() {
+  echo "$help"
+}
+
 main() {
   set -eo pipefail; [[ "$TRACE" ]] && set -x
 
