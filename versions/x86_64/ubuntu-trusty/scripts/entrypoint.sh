@@ -39,7 +39,7 @@ eval_opts() {
 
 cp_to_workplace() {
   mkdir -p "$PKG_NAME"
-  cp -r /opt/src/* "$PWD"/"$PKG_NAME"/
+  cp -r /opt/src/ "$PWD"/"$PKG_NAME"/
 }
 
 print_motd() {
