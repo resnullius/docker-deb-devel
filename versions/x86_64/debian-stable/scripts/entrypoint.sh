@@ -73,6 +73,10 @@ print_help() {
   echo "$help"
 }
 
+print_help() {
+  echo "$help"
+}
+
 main() {
   set -eo pipefail; [[ "$TRACE" ]] && set -x
 
