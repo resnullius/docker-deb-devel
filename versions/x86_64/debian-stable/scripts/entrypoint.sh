@@ -55,6 +55,7 @@ download_upstream() {
 
 install_builddeps() {
   pushd "$PKG_NAME"
+  apt-get update
   mk-build-deps --install --tool "/usr/bin/apt-get --no-install-recommends -y" ./debian/control
   popd
 }
@@ -67,6 +68,10 @@ run_build() {
 
 mv_pkgs() {
   mv "$PWD"/*.{deb,dsc,changes,tar.gz} "$OUTPUT_DIR"
+}
+
+print_help() {
+  echo "$help"
 }
 
 main() {
