@@ -38,7 +38,6 @@ eval_opts() {
 }
 
 cp_to_workplace() {
-  mkdir -p "$PKG_NAME"
   cp -r /opt/src/ "$PWD"/"$PKG_NAME"/
 }
 
@@ -67,7 +66,7 @@ run_build() {
 }
 
 mv_pkgs() {
-  mv "$PWD"/*.{deb,dsc,changes,tar.gz} "$OUTPUT_DIR"
+  mv "$PWD"/*.{deb,dsc,changes,tar.*} "$OUTPUT_DIR"
 }
 
 print_help() {
