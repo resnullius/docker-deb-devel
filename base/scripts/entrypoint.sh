@@ -56,7 +56,7 @@ install_builddeps() {
   pushd "$PKG_NAME"
   apt-get update
   mk-build-deps --install --tool "/usr/bin/apt-get --no-install-recommends -y" ./debian/control
-  rm -f "$PKG_NAME"-build-deps_*.deb
+  [ -f "$PKG_NAME"-build-deps_*.deb ] && rm -f "$PKG_NAME"-build-deps_*.deb
   popd
 }
 
