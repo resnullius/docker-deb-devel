@@ -36,7 +36,7 @@ build() {
     ( # shellcheck source=versions/x86_64/debian-unstable/options
     source "$version"/options
     for tag in "${TAGS[@]}"; do
-      docker build -t "$tag" "$version"
+      docker build --pull -t "$tag" "$version"
     done
     )
   done
