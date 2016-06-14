@@ -1,6 +1,8 @@
 FROM ubuntu:trusty
 MAINTAINER Jose-Luis Rivas <me@ghostbar.co>
 
+ENV DEBIAN_FRONTEND noninteractive
+
 VOLUME /opt/pkgs
 VOLUME /opt/src
 
