@@ -3,12 +3,14 @@
 
 declare help="
 Usage:
-  entrypoint.sh -p random [-o /opt/pkgs]
+  entrypoint.sh -p random [-o /opt/pkgs] [-e 'https://extra.org/repo what where']
+                [-e 'https://extra.org/repo what2 where2']
 
 Options:
   -o    Output dir (change this if you changed the Dockerfile default from
         /opt/pkgs).
   -p    Package name (required)
+  -e    Extra repository to be added
 "
 
 declare ARCH
@@ -16,6 +18,7 @@ ARCH=$(uname -m)
 declare BUILD_ARCH="$ARCH"
 declare OUTPUT_DIR="/opt/pkgs"
 declare PKG_NAME
+declare -a EXTRA_REPOS
 
 declare PRE
 PRE=$(echo "$ARCH" | grep "arm")
@@ -24,16 +27,24 @@ if [ "$PRE" == "$ARCH" ]; then
 fi
 
 eval_opts() {
-  while getopts ":o:p:" opt "$@"; do
+  while getopts ":o:p:e:" opt "$@"; do
     case "$opt" in
       o)    OUTPUT_DIR="$OPTARG";;
       p)    PKG_NAME="$OPTARG";;
+      e)    EXTRA_REPOS+=("$OPTARG");;
       \?)   echo "Invalid option -$OPTARG was ignored." >&2;;
       :)
         echo "Option -$OPTARG requires an argument." >&2
         echo "$help"
         exit 1;;
     esac
+  done
+}
+
+add_extra_repos() {
+  touch /etc/apt/sources.list.d/extra.list
+  for repo in "${EXTRA_REPOS[@]}"; do
+    echo "deb $repo" >> /etc/apt/sources.list.d/extra.list
   done
 }
 
@@ -54,6 +65,7 @@ download_upstream() {
 
 install_builddeps() {
   pushd "$PKG_NAME"
+  add_extra_repos
   apt-get update
   mk-build-deps --install --tool "/usr/bin/apt-get --no-install-recommends -y" ./debian/control
   [ -f "$PKG_NAME"-build-deps_*.deb ] && rm -f "$PKG_NAME"-build-deps_*.deb
