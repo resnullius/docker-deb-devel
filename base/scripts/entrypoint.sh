@@ -4,13 +4,14 @@
 declare help="
 Usage:
   entrypoint.sh -p random [-o /opt/pkgs] [-e 'https://extra.org/repo what where']
-                [-e 'https://extra.org/repo what2 where2']
+                [-e 'https://extra.org/repo what2 where2'] [-g 0xDEADDEAD]
 
 Options:
   -o    Output dir (change this if you changed the Dockerfile default from
         /opt/pkgs).
   -p    Package name (required)
   -e    Extra repository to be added
+  -g    Extra GPG keys
 "
 
 declare ARCH
@@ -19,6 +20,7 @@ declare BUILD_ARCH="$ARCH"
 declare OUTPUT_DIR="/opt/pkgs"
 declare PKG_NAME
 declare -a EXTRA_REPOS
+declare -a EXTRA_GPG_KEYS
 
 declare PRE
 PRE=$(echo "$ARCH" | grep "arm")
@@ -27,11 +29,12 @@ if [ "$PRE" == "$ARCH" ]; then
 fi
 
 eval_opts() {
-  while getopts ":o:p:e:" opt "$@"; do
+  while getopts ":o:p:e:g:" opt "$@"; do
     case "$opt" in
       o)    OUTPUT_DIR="$OPTARG";;
       p)    PKG_NAME="$OPTARG";;
       e)    EXTRA_REPOS+=("$OPTARG");;
+      g)    EXTRA_GPG_KEYS+=("$OPTARG");;
       \?)   echo "Invalid option -$OPTARG was ignored." >&2;;
       :)
         echo "Option -$OPTARG requires an argument." >&2
@@ -42,6 +45,11 @@ eval_opts() {
 }
 
 add_extra_repos() {
+  for key in "${EXTRA_GPG_KEYS[@]}"; do
+    gpg --recv-keys "$key"
+    gpg --export --armor "$key" | apt-key add -
+  done
+
   touch /etc/apt/sources.list.d/extra.list
   for repo in "${EXTRA_REPOS[@]}"; do
     echo "deb $repo" >> /etc/apt/sources.list.d/extra.list
