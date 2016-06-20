@@ -46,7 +46,7 @@ eval_opts() {
 
 add_extra_repos() {
   for key in "${EXTRA_GPG_KEYS[@]}"; do
-    gpg --recv-keys "$key"
+    gpg --keyserver pgp.mit.edu --recv-keys "$key"
     gpg --export --armor "$key" | apt-key add -
   done
 
