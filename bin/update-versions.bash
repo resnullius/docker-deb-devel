@@ -36,11 +36,9 @@ mkbasecp() {
 }
 
 update_from() {
-  if [ "$OS" = "Darwin" ]; then
-    sed -i '' -e "s/FROM /FROM $3/" "versions/$1/$2/Dockerfile"
-  else
-    sed -i -e "s/FROM /FROM $3/" "versions/$1/$2/Dockerfile"
-  fi
+  cp "versions/$1/$2/Dockerfile" "tmp-dockerfile"
+  sed -e "s/FROM.*/FROM $3/" "tmp-dockerfile" > "versions/$1/$2/Dockerfile"
+  rm "tmp-dockerfile"
 }
 
 create_tag() {
