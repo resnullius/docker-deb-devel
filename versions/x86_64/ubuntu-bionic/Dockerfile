@@ -1,4 +1,4 @@
-FROM ubuntu:wily
+FROM ubuntu:bionic
 MAINTAINER Jose-Luis Rivas <me@ghostbar.co>
 
 ENV DEBIAN_FRONTEND noninteractive
