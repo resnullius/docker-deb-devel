@@ -77,7 +77,7 @@ push() {
 }
 
 update_versions() {
-  bash bin/update-versions.bash run
+  bash bin/update-versions.sh run
 }
 
 version() {
