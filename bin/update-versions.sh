@@ -15,7 +15,7 @@ Options:
 "
 
 declare version="
-Version: 1.0.0.
+Version: 1.0.1.
 Licensed under the MIT terms.
 "
 
@@ -36,9 +36,8 @@ mkbasecp() {
 }
 
 update_from() {
-  cp "versions/$1/$2/Dockerfile" "tmp-dockerfile"
-  sed -e "s/FROM.*/FROM $3/" "tmp-dockerfile" > "versions/$1/$2/Dockerfile"
-  rm "tmp-dockerfile"
+  sed -e "s/FROM.*/FROM $3/" "versions/$1/$2/Dockerfile" > "tmp-dockerfile"
+  mv "tmp-dockerfile" "versions/$1/$2/Dockerfile"
 }
 
 create_tag() {
