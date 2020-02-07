@@ -67,7 +67,7 @@ print_motd() {
 
 download_upstream() {
   pushd "$PKG_NAME"
-  uscan --force-download
+  uscan --force-download --download-current-version
   popd
 }
 
